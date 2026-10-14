@@ -1,0 +1,108 @@
+import {
+  Activity,
+  AlertTriangle,
+  ArrowDownNarrowWide,
+  ArrowDownToLine,
+  Bell,
+  ChevronsDown,
+  Compass,
+  Crosshair,
+  Flame,
+  Gauge,
+  Layers,
+  Minus,
+  Mountain,
+  PowerOff,
+  Radio,
+  ShieldCheck,
+  SlidersHorizontal,
+  Siren,
+  Wind,
+} from 'lucide-react'
+import type { Sound } from '../types'
+
+const OWNER = (note?: string) => ({
+  name: 'Owner aircraft library',
+  license: 'Owned / cleared by site author',
+  ...(note ? { note } : {}),
+})
+
+export const SOUNDS: Sound[] = [
+  // Landing callouts
+  { id: 'ten', label: 'TEN', spoken: 'Ten', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: ChevronsDown },
+  { id: 'twenty', label: 'TWENTY', spoken: 'Twenty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: ChevronsDown },
+  { id: 'thirty', label: 'THIRTY', spoken: 'Thirty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: ChevronsDown },
+  { id: 'forty', label: 'FORTY', spoken: 'Forty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: ChevronsDown },
+  { id: 'fifty', label: 'FIFTY', spoken: 'Fifty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: ChevronsDown },
+
+  // Altitude callouts
+  { id: 'one-hundred', label: 'ONE HUNDRED', spoken: 'One hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'two-hundred', label: 'TWO HUNDRED', spoken: 'Two hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'three-hundred', label: 'THREE HUNDRED', spoken: 'Three hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'four-hundred', label: 'FOUR HUNDRED', spoken: 'Four hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'five-hundred', label: 'FIVE HUNDRED', spoken: 'Five hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'one-thousand', label: 'ONE THOUSAND', spoken: 'One thousand', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+  { id: 'twenty-five-hundred', label: 'TWENTY FIVE HUNDRED', spoken: 'Twenty five hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER('Boeing EGPWS'), icon: Radio },
+  { id: 'plus-100', label: 'PLUS 100', spoken: 'Plus one hundred', categories: ['altitude'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Radio },
+
+  // Airbus radio altimeter (GPWS) callouts
+  { id: 'airbus-2500', label: 'AIRBUS 2500', spoken: 'Two thousand five hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-2000', label: 'AIRBUS 2000', spoken: 'Two thousand', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-1000', label: 'AIRBUS 1000', spoken: 'One thousand', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-500', label: 'AIRBUS 500', spoken: 'Five hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-400', label: 'AIRBUS 400', spoken: 'Four hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-300', label: 'AIRBUS 300', spoken: 'Three hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-200', label: 'AIRBUS 200', spoken: 'Two hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-100', label: 'AIRBUS 100', spoken: 'One hundred', categories: ['landing', 'altitude'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-hundred-above', label: 'AIRBUS HUNDRED ABOVE', spoken: 'One hundred above', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-hundred-and', label: 'AIRBUS HUNDRED AND', spoken: 'One hundred and', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-90', label: 'AIRBUS 90', spoken: 'Ninety', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-80', label: 'AIRBUS 80', spoken: 'Eighty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-70', label: 'AIRBUS 70', spoken: 'Seventy', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-60', label: 'AIRBUS 60', spoken: 'Sixty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-50', label: 'AIRBUS 50', spoken: 'Fifty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-40', label: 'AIRBUS 40', spoken: 'Forty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS — Sully'), icon: ChevronsDown },
+  { id: 'airbus-30', label: 'AIRBUS 30', spoken: 'Thirty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS — Sully'), icon: ChevronsDown },
+  { id: 'airbus-20', label: 'AIRBUS 20', spoken: 'Twenty', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS — Sully'), icon: ChevronsDown },
+  { id: 'airbus-10', label: 'AIRBUS 10', spoken: 'Ten', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-5', label: 'AIRBUS 5', spoken: 'Five', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: ChevronsDown },
+  { id: 'airbus-retard', label: 'AIRBUS RETARD', spoken: 'Retard, retard', categories: ['landing'], tone: 'caution', origin: 'authentic', source: OWNER('Airbus GPWS'), icon: Minus },
+  { id: 'airbus-v1', label: 'AIRBUS V1', spoken: 'V1', categories: ['warnings'], tone: 'info', origin: 'authentic', source: OWNER('Airbus'), icon: Gauge },
+
+  // Minimums / decision height
+  { id: 'approaching-minimums', label: 'APPROACHING MINIMUMS', spoken: 'Approaching minimums', categories: ['landing'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Crosshair },
+  { id: 'minimums', label: 'MINIMUMS', spoken: 'Minimums', categories: ['landing'], tone: 'info', origin: 'authentic', source: OWNER(), icon: Crosshair },
+  { id: 'approaching-decision-height', label: 'APPROACHING DECISION HEIGHT', spoken: 'Approaching decision height', categories: ['landing'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Crosshair },
+
+  // GPWS / terrain
+  { id: 'pull-up', label: 'PULL UP', spoken: 'Pull up, pull up, pull up', categories: ['gpws', 'warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: AlertTriangle },
+  { id: 'terrain', label: 'TERRAIN', spoken: 'Terrain, terrain', categories: ['gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Mountain },
+  { id: 'terrain-ahead', label: 'TERRAIN AHEAD', spoken: 'Terrain ahead, pull up', categories: ['gpws', 'warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Mountain },
+  { id: 'terrain-pullup', label: 'TERRAIN — PULL UP', spoken: 'Terrain, terrain, pull up, pull up', categories: ['gpws', 'warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Mountain },
+  { id: 'sink-rate', label: 'SINK RATE', spoken: 'Sink rate, pull up, sink rate', categories: ['gpws', 'warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: ArrowDownNarrowWide },
+  { id: 'too-low-terrain', label: 'TOO LOW TERRAIN', spoken: 'Too low, terrain', categories: ['gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: ArrowDownToLine },
+  { id: 'too-low-gear', label: 'TOO LOW GEAR', spoken: 'Too low, gear', categories: ['gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: ArrowDownToLine },
+  { id: 'too-low-flaps', label: 'TOO LOW FLAPS', spoken: 'Too low, flaps', categories: ['gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: ArrowDownToLine },
+  { id: 'caution-obstacle', label: 'CAUTION OBSTACLE', spoken: 'Caution, obstacle', categories: ['gpws', 'warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: ShieldCheck },
+  { id: 'air-speed-low', label: 'AIRSPEED LOW', spoken: 'Airspeed low', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Gauge },
+  { id: 'glideslope', label: 'GLIDE SLOPE', spoken: 'Glide slope, glide slope, glide slope', categories: ['gpws'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Crosshair },
+  { id: 'dont-sink', label: "DON'T SINK", spoken: "Don't sink, don't sink", categories: ['gpws'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Minus },
+  { id: 'obstacle-ahead', label: 'OBSTACLE AHEAD', spoken: 'Obstacle ahead, pull up', categories: ['gpws', 'warnings'], tone: 'danger', origin: 'authentic', source: OWNER('A380'), icon: ShieldCheck },
+  { id: 'gpws-suite', label: 'GPWS SUITE', spoken: 'Full Boeing GPWS callout suite', categories: ['gpws'], tone: 'danger', origin: 'authentic', source: OWNER('Boeing 737/747/757/767/777'), icon: Layers },
+
+  // Warnings
+  { id: 'windshear-boeing', label: 'WINDSHEAR — BOEING', spoken: 'Windshear, windshear, windshear', categories: ['warnings', 'gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Wind },
+  { id: 'windshear-airbus', label: 'WINDSHEAR — AIRBUS', spoken: 'Windshear, windshear, windshear', categories: ['warnings', 'gpws'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Wind },
+  { id: 'stall-airbus', label: 'STALL — AIRBUS', spoken: 'Stall, stall (repetitive)', categories: ['warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Activity },
+  { id: 'stall-boeing', label: 'STALL — BOEING', spoken: 'Stall, stall (repetitive)', categories: ['warnings'], tone: 'danger', origin: 'authentic', source: OWNER('Boeing 717'), icon: Activity },
+  { id: 'bank-angle', label: 'BANK ANGLE', spoken: 'Bank angle, bank angle, bank angle', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Compass },
+  { id: 'master-warning-airbus', label: 'MASTER WARNING', spoken: 'Continuous repetitive chime', categories: ['warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Siren },
+  { id: 'overspeed-boeing', label: 'OVERSPEED', spoken: 'Overspeed clacker', categories: ['warnings'], tone: 'danger', origin: 'authentic', source: OWNER(), icon: Gauge },
+  { id: 'altitude-alert-boeing', label: 'ALTITUDE ALERT — BOEING', spoken: 'Altitude alert tones', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Bell },
+  { id: 'altitude-alert-airbus', label: 'ALTITUDE ALERT — AIRBUS', spoken: 'Altitude alert chimes', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: Bell },
+  { id: 'fire-bell-boeing', label: 'ENGINE FIRE BELL', spoken: 'Fire bell', categories: ['warnings'], tone: 'danger', origin: 'authentic', source: OWNER('Boeing 737'), icon: Flame },
+  { id: 'ap-disconnect-airbus', label: 'AUTOPILOT DISCONNECT — AIRBUS', spoken: 'Autopilot disconnect', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: PowerOff },
+  { id: 'ap-disconnect-boeing', label: 'AUTOPILOT DISCONNECT — BOEING', spoken: 'Autopilot disconnect', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: PowerOff },
+  { id: 'config-warning-airbus', label: 'CONFIG WARNING — AIRBUS', spoken: 'Configuration warning', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: SlidersHorizontal },
+  { id: 'config-warning-boeing', label: 'CONFIG WARNING — BOEING', spoken: 'Configuration warning horn', categories: ['warnings'], tone: 'caution', origin: 'authentic', source: OWNER(), icon: SlidersHorizontal },
+]
