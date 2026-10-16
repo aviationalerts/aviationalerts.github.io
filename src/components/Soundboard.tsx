@@ -43,6 +43,7 @@ function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: 
   const duration = sb.manifest?.[sound.id]?.duration
   const cat = sound.categories[0] ?? 'gpws'
   const gi = SOUNDS.findIndex((s) => s.id === sound.id)
+  const shared = sb.sharedId === sound.id
 
   return (
     <div
@@ -50,17 +51,25 @@ function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: 
       role="button"
       tabIndex={avail === 'missing' ? -1 : 0}
       data-playing={playing}
+      data-shared={shared || undefined}
       data-avail={avail === 'missing' ? 'missing' : 'ok'}
       data-sound={sound.id}
       style={{
         ['--accent']: TONE_VAR[sound.tone],
         ['--i']: String(index),
       } as React.CSSProperties}
-      onClick={() => avail !== 'missing' && sb.togglePlay(sound.id)}
+      onClick={() => {
+        if (avail === 'missing') return
+        sb.togglePlay(sound.id)
+        if (shared) sb.clearSharedId()
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          if (avail !== 'missing') sb.togglePlay(sound.id)
+          if (avail !== 'missing') {
+            sb.togglePlay(sound.id)
+            if (shared) sb.clearSharedId()
+          }
         }
       }}
       aria-pressed={playing}
@@ -103,22 +112,24 @@ export function Soundboard({ sb }: { sb: Soundboard }) {
   ]
 
   return (
-    <main className="board" id="board">
+    <main className="board">
       <div className="board-head">
         <div>
           <p className="hero-kicker">// Select channel</p>
           <h2 className="board-title">Soundboard</h2>
           <p className="board-sub">{sb.filtered.length} channels available</p>
         </div>
-        <button
-          type="button"
-          className="fav-toggle"
-          aria-pressed={sb.favoritesOnly}
-          onClick={() => sb.setFavoritesOnly((v) => !v)}
-        >
-          <Star size={11} fill={sb.favoritesOnly ? 'currentColor' : 'none'} />
-          Favorites
-        </button>
+        <div className="board-head-actions">
+          <button
+            type="button"
+            className="fav-toggle"
+            aria-pressed={sb.favoritesOnly}
+            onClick={() => sb.setFavoritesOnly((v) => !v)}
+          >
+            <Star size={11} fill={sb.favoritesOnly ? 'currentColor' : 'none'} />
+            Favorites
+          </button>
+        </div>
       </div>
 
       <div className="filters" role="group" aria-label="Filter by category">
@@ -137,7 +148,24 @@ export function Soundboard({ sb }: { sb: Soundboard }) {
 
       <div className="board-grid" data-testid="board-grid">
         {sb.filtered.length === 0 ? (
-          <div className="board-empty">No match — try another callsign</div>
+          <div className="board-empty">
+            <span className="board-empty-icon" aria-hidden="true">⌁</span>
+            <p className="board-empty-title">
+              {sb.query ? `No channels match “${sb.query}”` : 'No channels match your filters'}
+            </p>
+            <p className="board-empty-sub">Try a different callsign or reset the filters</p>
+            <button
+              type="button"
+              className="board-empty-btn"
+              onClick={() => {
+                sb.setQuery('')
+                sb.setCategory('all')
+                sb.setFavoritesOnly(false)
+              }}
+            >
+              Clear all filters
+            </button>
+          </div>
         ) : (
           sb.filtered.map((sound, i) => (
             <SoundTile key={sound.id} sound={sound} sb={sb} index={i} />

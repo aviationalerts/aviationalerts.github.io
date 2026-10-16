@@ -9,29 +9,95 @@ export interface AudioEngineCallbacks {
 let switchPool: HTMLAudioElement[] = []
 let switchIdx = 0
 
-function playSwitchClick() {
-  if (switchPool.length === 0) {
-    for (let i = 0; i < 3; i++) {
-      const a = new Audio('/audio/switch.m4a')
-      a.volume = 0.22
-      a.preload = 'auto'
-      switchPool.push(a)
-    }
+// Warm switch click immediately
+if (typeof Audio !== 'undefined') {
+  for (let i = 0; i < 3; i++) {
+    const a = new Audio('/audio/switch.m4a')
+    a.volume = 0.22
+    a.preload = 'auto'
+    switchPool.push(a)
   }
+}
+
+const SWITCH_BASE_VOLUME = 0.22
+
+function setSwitchVolume(v: number) {
+  const vol = Math.min(1, Math.max(0, v)) * SWITCH_BASE_VOLUME
+  for (const a of switchPool) a.volume = vol
+}
+
+function playSwitchClick() {
+  if (switchPool.length === 0) return
   const a = switchPool[switchIdx]
   switchIdx = (switchIdx + 1) % switchPool.length
   a.currentTime = 0
   a.play().catch(() => {})
 }
 
-export { playSwitchClick }
+export { playSwitchClick, setSwitchVolume }
 
 const WAVE_BARS = 24
+
+// Shared audio graph — createMediaElementSource can only run once per element,
+// and closing the context would mute the element forever (StrictMode double-mount).
+let sharedCtx: AudioContext | null = null
+let sharedAnalyser: AnalyserNode | null = null
+const sourceMap = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>()
+
+function getAnalyserFor(el: HTMLAudioElement): { ctx: AudioContext; analyser: AnalyserNode } | null {
+  try {
+    if (!sharedCtx || sharedCtx.state === 'closed') {
+      sharedCtx = new AudioContext()
+      sharedAnalyser = sharedCtx.createAnalyser()
+      sharedAnalyser.fftSize = 128
+      sharedAnalyser.smoothingTimeConstant = 0.75
+      sharedAnalyser.connect(sharedCtx.destination)
+    }
+    if (!sharedAnalyser || !sharedCtx) return null
+    if (!sourceMap.has(el)) {
+      const src = sharedCtx.createMediaElementSource(el)
+      src.connect(sharedAnalyser)
+      sourceMap.set(el, src)
+    }
+    if (sharedCtx.state === 'suspended') sharedCtx.resume().catch(() => {})
+    return { ctx: sharedCtx, analyser: sharedAnalyser }
+  } catch {
+    return null
+  }
+}
+
+// Background preload pool — fetches files ahead of time so play() is instant
+const preloadPool = new Map<string, HTMLAudioElement>()
+
+export function preloadSound(id: string) {
+  if (preloadPool.has(id)) return
+  const a = new Audio()
+  a.preload = 'auto'
+  a.src = `/audio/${id}.mp3`
+  preloadPool.set(id, a)
+}
+
+export function preloadSounds(ids: string[], concurrency = 6) {
+  let i = 0
+  const next = () => {
+    while (i < ids.length) {
+      const id = ids[i++]
+      if (!preloadPool.has(id)) {
+        preloadSound(id)
+        // stagger to avoid network contention
+        setTimeout(next, 120)
+        return
+      }
+    }
+  }
+  for (let k = 0; k < concurrency; k++) setTimeout(next, k * 80)
+}
 
 export class AudioEngine {
   private audio = new Audio()
   private currentId: string | null = null
   private volume = 1
+  private loopOn = false
   private callbacks: AudioEngineCallbacks
 
   private ambience = new Audio('/audio/ambience.mp3')
@@ -39,16 +105,16 @@ export class AudioEngine {
 
   private ctx: AudioContext | null = null
   private analyser: AnalyserNode | null = null
-  private source: MediaElementAudioSourceNode | null = null
   private waveData = new Uint8Array(WAVE_BARS)
-  private rafId = 0
 
   constructor(callbacks: AudioEngineCallbacks) {
     this.callbacks = callbacks
     this.audio.preload = 'auto'
+    this.audio.loop = false
     this.audio.addEventListener('ended', () => {
       const id = this.currentId
       this.currentId = null
+      document.title = 'Aviation Alerts — Warning Soundboard'
       if (id) {
         this.callbacks.onProgress?.(0, this.audio.duration || 0)
         this.callbacks.onEnded(id)
@@ -62,6 +128,7 @@ export class AudioEngine {
     this.audio.addEventListener('error', () => {
       const id = this.currentId
       this.currentId = null
+      document.title = 'Aviation Alerts — Warning Soundboard'
       if (id) {
         this.callbacks.onError(id, 'Audio file failed to load.')
       }
@@ -72,19 +139,11 @@ export class AudioEngine {
   }
 
   private ensureAnalyser() {
-    if (this.ctx) return
-    try {
-      this.ctx = new AudioContext()
-      this.analyser = this.ctx.createAnalyser()
-      this.analyser.fftSize = 128
-      this.analyser.smoothingTimeConstant = 0.75
-      this.source = this.ctx.createMediaElementSource(this.audio)
-      this.source.connect(this.analyser)
-      this.analyser.connect(this.ctx.destination)
-      this.waveData = new Uint8Array(this.analyser.frequencyBinCount)
-    } catch {
-      this.ctx = null
-      this.analyser = null
+    const g = getAnalyserFor(this.audio)
+    if (g) {
+      this.ctx = g.ctx
+      this.analyser = g.analyser
+      this.waveData = new Uint8Array(g.analyser.frequencyBinCount)
     }
   }
 
@@ -101,6 +160,17 @@ export class AudioEngine {
   setVolume(v: number) {
     this.volume = Math.min(1, Math.max(0, v))
     this.audio.volume = this.volume
+    this.ambience.volume = this.volume * 0.35
+    setSwitchVolume(this.volume)
+  }
+
+  setLoop(on: boolean) {
+    this.loopOn = on
+    this.audio.loop = on
+  }
+
+  get isLoopOn() {
+    return this.loopOn
   }
 
   play(id: string) {
@@ -112,12 +182,19 @@ export class AudioEngine {
     this.ensureAnalyser()
     if (this.ctx?.state === 'suspended') this.ctx.resume().catch(() => {})
     this.currentId = id
-    this.audio.src = `/audio/${id}.mp3`
+    // Reuse preloaded element if available — avoids a network wait
+    const pre = preloadPool.get(id)
+    if (pre && pre.readyState >= 2) {
+      this.audio.src = pre.src
+    } else {
+      this.audio.src = `/audio/${id}.mp3`
+    }
     this.audio.volume = this.volume
-    document.title = `▶ ${id.replace(/-/g, ' ')} · Aviation Alerts`
+    document.title = `▶ ${id.replace(/-/g, ' ').toUpperCase()} · AVIATION ALERTS`
+    // Fire onPlay immediately for instant UI feedback
+    this.callbacks.onPlay(id)
     this.audio
       .play()
-      .then(() => this.callbacks.onPlay(id))
       .catch((err: unknown) => {
         this.currentId = null
         document.title = 'Aviation Alerts — Warning Soundboard'
@@ -159,8 +236,10 @@ export class AudioEngine {
   }
 
   destroy() {
-    cancelAnimationFrame(this.rafId)
-    this.ctx?.close().catch(() => {})
+    this.stop()
+    this.setAmbience(false)
+    // Do NOT close the shared AudioContext — the audio element stays
+    // permanently routed through it and would go silent forever.
   }
 }
 

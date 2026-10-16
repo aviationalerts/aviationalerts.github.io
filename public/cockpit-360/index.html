@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A320 Cockpit | Aviation Alerts</title>
+
+    <meta name="description" content="Interactive 360° Airbus A320 cockpit panorama" />
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+    <style type="text/css">
+      @-ms-viewport { width: device-width; }
+      * { padding: 0; margin: 0; box-sizing: border-box; }
+      html { height: 100%; }
+      body { height: 100%; overflow: hidden; background: #0b1018; font-family: system-ui, -apple-system, sans-serif; }
+      #back-link {
+        position: fixed; top: 16px; left: 16px; z-index: 9999;
+        color: #e8a33a; text-decoration: none; font-weight: 600; font-size: 14px;
+        background: rgba(11,16,24,0.8); padding: 8px 14px; border-radius: 6px;
+        border: 1px solid rgba(232,163,58,0.35); backdrop-filter: blur(6px);
+      }
+      #back-link:hover { background: rgba(232,163,58,0.15); }
+      #container { height: 100%; min-height: 100%; width: 100%; margin: 0 auto; }
+      #tourDIV { height:100%; position:relative; overflow:hidden; }
+      #panoDIV { height:100%; position:relative; overflow:hidden; user-select: none; -webkit-user-select: none; }
+    </style>
+    <script type="text/javascript" src="COCKPITdata/lib/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+    // ── Kill krpano context menu BEFORE viewer loads ──
+    (function() {
+      // Capture-phase listener on window runs before anything krpano registers
+      window.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }, true);
+
+      // Patch canvas addEventListener so krpano can't register its own contextmenu handler
+      var origAddEventListener = HTMLCanvasElement.prototype.addEventListener;
+      HTMLCanvasElement.prototype.addEventListener = function(type, fn, capture) {
+        if (type === 'contextmenu') return; // silently drop it
+        return origAddEventListener.call(this, type, fn, capture);
+      };
+
+      // Same for Element (covers divs krpano creates)
+      var origElAdd = Element.prototype.addEventListener;
+      Element.prototype.addEventListener = function(type, fn, capture) {
+        if (type === 'contextmenu') return;
+        return origElAdd.call(this, type, fn, capture);
+      };
+    })();
+
+    function readDeviceOrientation() {
+      var winH = window.innerHeight ? window.innerHeight : jQuery(window).height();
+      if(!winH || winH == 0) winH = '100%';
+      jQuery('html').css('height', winH);
+      window.scrollTo(0,0);
+    }
+    jQuery(document).ready(function($) {
+      if (/(iphone|ipod|ipad|android|iemobile|webos|fennec|blackberry|kindle|series60|playbook|opera\smini|opera\s mobi|opera\stablet|symbianos|palmsource|palmos|blazer|windows\sce|windows\sphone|wp7|bolt|doris|dorothy|gobrowser|iris|maemo|minimo|netfront|semc-browser|skyfire|teashark|teleca|uzardweb|avantgo|docomo|kddi|ddipocket|polaris|udcweb|opwv|plink|plucker|pie|xiino|benq|playbook|bb|cricket|dell|bb10|nintendo|up.browser|playstation|tear|mib|obigo|midp|mobile|tablet)/.test(navigator.userAgent.toLowerCase())) {
+        jQuery(window).resize(function() { readDeviceOrientation(); });
+        readDeviceOrientation();
+      }
+    });
+    </script>
+</head>
+<body>
+    <a id="back-link" href="/">← Back to Soundboard</a>
+    <div id="container">
+      <div id="tourDIV">
+        <div id="panoDIV">
+          <noscript>You must activate JavaScript to visualize the Virtual Tour.</noscript>
+        </div>
+
+        <script type="text/javascript" src="COCKPITdata/COCKPIT.js"></script>
+        <script type="text/javascript">
+          embedpano({
+            xml:"COCKPITdata/COCKPIT.xml"
+            ,target:"panoDIV"
+            ,passQueryParameters:true
+            ,html5:"only"
+          });
+        </script>
+      </div>
+    </div>
+</body>
+</html>

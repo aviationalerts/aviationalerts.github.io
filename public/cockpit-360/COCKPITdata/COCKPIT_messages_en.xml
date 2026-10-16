@@ -1,0 +1,30 @@
+<krpano>
+<!-- ************************ -->
+<!--         Messages         -->
+<!-- ************************ -->
+<data name="en_project_title">Nouveau projet</data>
+<data name="en_project_author_name">
+© AIRBUS S.A.S. 2014 - photo by master films / H. GOUSSÉ
+</data>
+<data name="en_pano22_title">[Group 3]-MFP_3417_MFP_3448 - copie-12 images</data>
+<data name="en_controlBar_classicprevSceneTip">Previous panorama</data>
+<data name="en_controlBar_classicnextSceneTip">Next panorama</data>
+<data name="en_controlBar_classiczoomInTip">Zoom in</data>
+<data name="en_controlBar_classiczoomOutTip">Zoom out</data>
+<data name="en_controlBar_classicmoveLeftTip">Move left</data>
+<data name="en_controlBar_classicmoveRightTip">Move right</data>
+<data name="en_controlBar_classicmoveUpTip">Move up</data>
+<data name="en_controlBar_classicmoveDownTip">Move down</data>
+<data name="en_controlBar_classicopenFsTip">Enter fullscreen</data>
+<data name="en_controlBar_classiccloseFsTip">Exit fullscreen</data>
+<data name="en_controlBar_classicautorotateOnTip">Start autorotation</data>
+<data name="en_controlBar_classicautorotateOffTip">Stop autorotation</data>
+<data name="en_controlBar_classicdisplayInfoTip">Show information</data>
+<data name="en_controlBar_classichideInfoTip">Hide information</data>
+<data name="en_controlBar_classicdisplayControlsTip">Show controls</data>
+<data name="en_controlBar_classichideControlsTip">Hide controls</data>
+<data name="en_controlBar_classicctrlmodeDragTip">Change control mode</data>
+<data name="en_controlBar_classicctrlmodeMoveTip">Change control mode</data>
+<data name="en_logowebsiteurl"></data>
+<data name="en_logotooltipText">Open website</data>
+</krpano>
