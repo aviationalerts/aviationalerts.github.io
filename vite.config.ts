@@ -23,6 +23,21 @@ function serveCockpitIndex(): Plugin {
   }
 }
 
+function pagesSpaFallback(): Plugin {
+  return {
+    name: 'pages-spa-fallback',
+    closeBundle() {
+      const dist = path.resolve(process.cwd(), 'dist')
+      const index = path.join(dist, 'index.html')
+      if (fs.existsSync(index)) {
+        fs.copyFileSync(index, path.join(dist, '404.html'))
+        fs.writeFileSync(path.join(dist, '.nojekyll'), '')
+      }
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), serveCockpitIndex()],
+  base: '/',
+  plugins: [react(), tailwindcss(), serveCockpitIndex(), pagesSpaFallback()],
 })

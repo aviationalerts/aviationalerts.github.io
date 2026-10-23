@@ -7,7 +7,6 @@ const NAV_LINKS = [
   { label: 'Soundboard', href: '/soundboard/' },
   { label: 'Historical Pilots', href: '/Historical-Pilots/' },
   { label: 'Notable Accidents', href: '/notable-accidents/' },
-  { label: 'Animations', href: '/animations/' },
 ]
 
 const QUALITIES: Quality[] = ['high', 'low', 'off']
