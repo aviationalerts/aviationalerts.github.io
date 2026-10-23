@@ -1,1 +1,0 @@
-import{h as e}from"./index-B_OaZyJz.js";import{t}from"./ErrorScene-DvyOxpin.js";var n=e();function r(){return(0,n.jsx)(t,{title:`403 - Forbidden`,subtitle:`Access to this page is forbidden.`})}export{r as default};
