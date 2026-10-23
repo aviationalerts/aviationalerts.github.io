@@ -21,10 +21,8 @@
 
          />
 
-  <events name="footer1events" 
-    onTourStart="showfooter1();"
+  <events name="footer1events"
     hidetourcontrols="hidefooter1();"
-    showtourcontrols="showfooter1();"
     keep="true" />
 
   <action name="hidefooter1">
@@ -119,7 +117,7 @@
 	
   </action>
 
-	<events name="theme2StartTourEvents" onTourStart="theme2CallOnStartTour();" keep="true" />
+	<events name="theme2StartTourEvents" keep="true" />
 
 	<action name="theme2CallOnStartTour">
 		
@@ -584,10 +582,8 @@
 
          />
 
-  <events name="footerevents" 
-    onTourStart="showfooter();"
+  <events name="footerevents"
     hidetourcontrols="hidefooter();"
-    showtourcontrols="showfooter();"
     keep="true" />
 
   <action name="hidefooter">
@@ -622,10 +618,8 @@
 
          />
 
-  <events name="logoevents" 
-    onTourStart="showlogo();"
+  <events name="logoevents"
     hidetourcontrols="hidelogo();"
-    showtourcontrols="showlogo();"
     keep="true" />
 
   <action name="hidelogo">

@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { ArrowLeft, Search } from 'lucide-react'
 import { ACCIDENTS } from '../data/accidents'
+import { PillNav } from '../components/PillNav'
+import { SiteFooter } from '../components/SiteFooter'
 
 export default function Accidents() {
   const [query, setQuery] = useState('')
@@ -27,10 +29,11 @@ export default function Accidents() {
 
   return (
     <div className="pilots-page">
+      <PillNav />
       <header className="pilots-header">
         <a href="/" className="pilots-back">
           <ArrowLeft size={14} />
-          <span>Back to Soundboard</span>
+          <span>Home</span>
         </a>
         <div className="pilots-title-block">
           <p className="pilots-kicker">// When things go wrong</p>
@@ -95,9 +98,7 @@ export default function Accidents() {
         </div>
       )}
 
-      <footer className="pilots-footer">
-        <span>Aviation Alerts</span>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

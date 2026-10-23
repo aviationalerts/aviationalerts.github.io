@@ -1,9 +1,9 @@
-import { Star } from 'lucide-react'
+import { memo } from 'react'
 import { SOUNDS } from '../data/sounds'
 import { CATEGORIES } from '../types'
 import type { Sound, Tone } from '../types'
 import type { Soundboard } from '../hooks/useSoundboard'
-import { WAVE_BARS } from '../lib/audio'
+import { WAVE_BARS, preloadSound } from '../lib/audio'
 
 const TONE_VAR: Record<Tone, string> = {
   danger: 'var(--color-danger)',
@@ -36,10 +36,14 @@ function TileWave({ data }: { data: Uint8Array | null }) {
   return <div className="tile-wave">{bars}</div>
 }
 
-function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: number }) {
+// Memo + value-based compare: the parent re-renders on every waveform tick,
+// but only the playing tile should actually re-render. Tile closures may hold
+// a slightly stale `sb`, which is safe — every method on it is a stable
+// callback (or an equivalent setState wrapper).
+const SoundTile = memo(
+  function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: number }) {
   const playing = sb.playingId === sound.id
   const avail = sb.availability(sound.id)
-  const fav = sb.favorites.includes(sound.id)
   const duration = sb.manifest?.[sound.id]?.duration
   const cat = sound.categories[0] ?? 'gpws'
   const gi = SOUNDS.findIndex((s) => s.id === sound.id)
@@ -72,6 +76,9 @@ function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: 
           }
         }
       }}
+      onPointerEnter={() => {
+        if (avail !== 'missing') preloadSound(sound.id)
+      }}
       aria-pressed={playing}
       aria-label={`Play ${sound.label}`}
     >
@@ -80,19 +87,6 @@ function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: 
         <span className="tile-code">{CAT_SHORT[cat] ?? 'SYS'}-{pad(gi + 1)}</span>
         {playing && <span className="tile-onair">ON AIR</span>}
       </span>
-
-      <button
-        type="button"
-        className="tile-fav"
-        aria-label={fav ? 'Remove favorite' : 'Add favorite'}
-        aria-pressed={fav}
-        onClick={(e) => {
-          e.stopPropagation()
-          sb.toggleFavorite(sound.id)
-        }}
-      >
-        <Star size={12} fill={fav ? 'currentColor' : 'none'} />
-      </button>
 
       <span className="tile-label">{sound.label}</span>
       <span className="tile-meta">
@@ -103,7 +97,24 @@ function SoundTile({ sound, sb, index }: { sound: Sound; sb: Soundboard; index: 
       {playing && <TileWave data={sb.waveform} />}
     </div>
   )
-}
+},
+  (prev, next) => {
+    if (
+      prev.sound !== next.sound ||
+      prev.index !== next.index ||
+      prev.sb.playingId !== next.sb.playingId ||
+      prev.sb.sharedId !== next.sb.sharedId ||
+      prev.sb.manifest !== next.sb.manifest
+    ) {
+      return false
+    }
+    // Waveform ticks every ~32ms — only the playing tile cares about it.
+    const prevOn = prev.sb.playingId === prev.sound.id
+    const nextOn = next.sb.playingId === next.sound.id
+    if (prevOn || nextOn) return prev.sb.waveform === next.sb.waveform
+    return true
+  },
+)
 
 export function Soundboard({ sb }: { sb: Soundboard }) {
   const filters = [
@@ -118,17 +129,6 @@ export function Soundboard({ sb }: { sb: Soundboard }) {
           <p className="hero-kicker">// Select channel</p>
           <h2 className="board-title">Soundboard</h2>
           <p className="board-sub">{sb.filtered.length} channels available</p>
-        </div>
-        <div className="board-head-actions">
-          <button
-            type="button"
-            className="fav-toggle"
-            aria-pressed={sb.favoritesOnly}
-            onClick={() => sb.setFavoritesOnly((v) => !v)}
-          >
-            <Star size={11} fill={sb.favoritesOnly ? 'currentColor' : 'none'} />
-            Favorites
-          </button>
         </div>
       </div>
 
@@ -160,7 +160,6 @@ export function Soundboard({ sb }: { sb: Soundboard }) {
               onClick={() => {
                 sb.setQuery('')
                 sb.setCategory('all')
-                sb.setFavoritesOnly(false)
               }}
             >
               Clear all filters

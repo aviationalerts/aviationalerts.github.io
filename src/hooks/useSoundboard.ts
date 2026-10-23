@@ -12,10 +12,8 @@ export interface ManifestEntry {
 
 export function useSoundboard() {
   const [volume, setVolume] = useLocalStorage('aa:volume', 0.85)
-  const [favorites, setFavorites] = useLocalStorage<string[]>('aa:favorites', [])
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<CategoryId | 'all'>('all')
-  const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [ambienceOn, setAmbienceOn] = useState(false)
   const [loopOn, setLoopOn] = useState(false)
   const [playingId, setPlayingId] = useState<string | null>(null)
@@ -50,26 +48,33 @@ export function useSoundboard() {
     })
   }
 
-  // Warm the audio cache in the background so first play is instant
+  // Warm the audio cache in the background so first play is instant.
+  // Start shortly after mount — waiting for the full window load event (plus
+  // an idle callback) meant an early first click hit an empty audio cache.
   useEffect(() => {
-    const idle = (window as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback
-    const start = () => preloadSounds(SOUNDS.map((s) => s.id))
-    if (idle) idle(start)
-    else setTimeout(start, 500)
+    const t = window.setTimeout(() => {
+      preloadSounds(SOUNDS.map((s) => s.id))
+    }, 500)
+    return () => window.clearTimeout(t)
   }, [])
 
-  // waveform rAF loop
+  // Waveform rAF loop — ONLY while something plays (throttled to ~30fps).
+  // An always-on per-frame setState re-rendered the entire app 60×/sec
+  // even when idle; the tile bars don't need more than 30fps anyway.
   useEffect(() => {
+    if (!playingId) return
     let raf = 0
-    const tick = () => {
-      const data = engineRef.current?.getWaveform()
-      if (data) setWaveform(new Uint8Array(data))
-      else setWaveform(null)
+    let last = 0
+    const tick = (now: number) => {
       raf = requestAnimationFrame(tick)
+      if (now - last < 32) return
+      last = now
+      const data = engineRef.current?.getWaveform()
+      setWaveform(data ? new Uint8Array(data) : null)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [])
+  }, [playingId])
 
   useEffect(() => {
     engineRef.current?.setVolume(volume)
@@ -125,25 +130,9 @@ export function useSoundboard() {
     window.history.replaceState(null, '', url)
   }, [])
 
-  // Shared link (?s=id): scroll to the board and cue the sound
-  useEffect(() => {
-    if (!sharedId) return
-    const t = window.setTimeout(() => {
-      document.getElementById('board')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 600)
-    return () => window.clearTimeout(t)
-  }, [sharedId])
+  // Shared link (?s=id): App opens the board overlay; the sound is cued above
 
   const toggleLoop = useCallback(() => setLoopOn((v) => !v), [])
-
-  const toggleFavorite = useCallback(
-    (id: string) => {
-      setFavorites((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-      )
-    },
-    [setFavorites],
-  )
 
   const availability = useCallback(
     (id: string): 'available' | 'missing' | 'unknown' => {
@@ -156,7 +145,6 @@ export function useSoundboard() {
   const filtered = useMemo(() => {
     return SOUNDS.filter((s) => {
       if (category !== 'all' && !s.categories.includes(category)) return false
-      if (favoritesOnly && !favorites.includes(s.id)) return false
       if (query.trim()) {
         const q = query.trim().toLowerCase()
         const haystack = `${s.label} ${s.spoken} ${s.categories.join(' ')}`.toLowerCase()
@@ -164,7 +152,7 @@ export function useSoundboard() {
       }
       return true
     })
-  }, [category, favoritesOnly, favorites, query])
+  }, [category, query])
 
   const counts = useMemo(() => ({ total: SOUNDS.length }), [])
 
@@ -174,10 +162,8 @@ export function useSoundboard() {
 
   return {
     volume, setVolume,
-    favorites, toggleFavorite,
     query, setQuery,
     category, setCategory,
-    favoritesOnly, setFavoritesOnly,
     ambienceOn, setAmbienceOn,
     loopOn, toggleLoop,
     playingId, errorMessage,

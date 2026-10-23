@@ -15,11 +15,91 @@
       body { height: 100%; overflow: hidden; background: #0b1018; font-family: system-ui, -apple-system, sans-serif; }
       #back-link {
         position: fixed; top: 16px; left: 16px; z-index: 9999;
-        color: #e8a33a; text-decoration: none; font-weight: 600; font-size: 14px;
-        background: rgba(11,16,24,0.8); padding: 8px 14px; border-radius: 6px;
-        border: 1px solid rgba(232,163,58,0.35); backdrop-filter: blur(6px);
+        display: inline-flex; align-items: center; gap: 8px;
+        color: #0b2f6a; text-decoration: none;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-weight: 600; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.92);
+        padding: 10px 16px; border-radius: 999px;
+        border: 1px solid rgba(11, 47, 106, 0.2);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
       }
-      #back-link:hover { background: rgba(232,163,58,0.15); }
+      #back-link:hover {
+        background: #ffffff;
+        border-color: rgba(0, 168, 232, 0.7);
+        transform: translateY(-1px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 184, 255, 0.35);
+      }
+      #back-link:active { transform: translateY(0) scale(0.96); }
+
+      /* ── viewer control toolbar ───────────────────────────── */
+      #vp-toolbar {
+        position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+        z-index: 9998;
+        display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+        gap: 3px;
+        padding: 7px;
+        border-radius: 999px;
+        background: rgba(11, 16, 24, 0.74);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        max-width: calc(100vw - 24px);
+        user-select: none; -webkit-user-select: none;
+      }
+      #vp-toolbar.is-hidden { display: none; }
+      #vp-toolbar .vp-sep {
+        width: 1px; height: 22px; margin: 0 5px;
+        background: rgba(255, 255, 255, 0.18);
+        flex: none;
+      }
+      #vp-toolbar button, #vp-reopen {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; padding: 0;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(232, 240, 252, 0.88);
+        cursor: pointer;
+        touch-action: none;
+        transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+      }
+      #vp-toolbar button svg, #vp-reopen svg {
+        width: 19px; height: 19px; display: block; pointer-events: none;
+      }
+      @media (hover: hover) {
+        #vp-toolbar button:hover, #vp-reopen:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(0, 184, 255, 0.6);
+          color: #7ee2ff;
+        }
+      }
+      #vp-toolbar button:active, #vp-reopen:active { transform: scale(0.9); }
+      #vp-toolbar button.is-hold {
+        background: rgba(0, 184, 255, 0.22);
+        border-color: rgba(0, 184, 255, 0.8);
+        color: #ffffff;
+      }
+      #vp-toolbar button.is-on {
+        background: linear-gradient(180deg, #123f8c, #0b2f6a);
+        border-color: rgba(0, 184, 255, 0.85);
+        color: #ffffff;
+        box-shadow: 0 0 0 1px rgba(0, 184, 255, 0.35), 0 6px 16px rgba(0, 0, 0, 0.4);
+      }
+      #vp-reopen {
+        position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+        z-index: 9998;
+        display: none;
+        background: rgba(11, 16, 24, 0.74);
+        border-color: rgba(255, 255, 255, 0.16);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      }
+      #vp-reopen.is-visible { display: inline-flex; }
+      #vp-reopen:active { transform: translateX(-50%) scale(0.9); }
+
       #container { height: 100%; min-height: 100%; width: 100%; margin: 0 auto; }
       #tourDIV { height:100%; position:relative; overflow:hidden; }
       #panoDIV { height:100%; position:relative; overflow:hidden; user-select: none; -webkit-user-select: none; }
@@ -65,7 +145,47 @@
     </script>
 </head>
 <body>
-    <a id="back-link" href="/">← Back to Soundboard</a>
+    <a id="back-link" href="/" aria-label="Back to Aviation Alerts home">&larr; Home</a>
+
+    <div id="vp-toolbar" role="toolbar" aria-label="Cockpit viewer controls">
+      <button type="button" data-k="zout" title="Zoom out" aria-label="Zoom out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>
+      </button>
+      <button type="button" data-k="zin" title="Zoom in" aria-label="Zoom in">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+      </button>
+      <span class="vp-sep"></span>
+      <button type="button" data-k="left" title="Look left" aria-label="Look left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </button>
+      <button type="button" data-k="up" title="Look up" aria-label="Look up">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+      </button>
+      <button type="button" data-k="right" title="Look right" aria-label="Look right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <button type="button" data-k="down" title="Look down" aria-label="Look down">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+      </button>
+      <span class="vp-sep"></span>
+      <button type="button" data-k="mode" title="Pan mode" aria-label="Pan mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+      </button>
+      <button type="button" data-k="rot" title="Auto-rotate" aria-label="Auto-rotate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+      </button>
+      <button type="button" data-k="fs" title="Fullscreen" aria-label="Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+      <span class="vp-sep"></span>
+      <button type="button" data-k="hide" title="Hide controls" aria-label="Hide controls">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+    <button type="button" id="vp-reopen" title="Show controls" aria-label="Show controls">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    </button>
+
     <div id="container">
       <div id="tourDIV">
         <div id="panoDIV">
@@ -74,12 +194,108 @@
 
         <script type="text/javascript" src="COCKPITdata/COCKPIT.js"></script>
         <script type="text/javascript">
+          // Capture the krpano viewer reference via the onready hook
+          var panoViewer = null;
           embedpano({
             xml:"COCKPITdata/COCKPIT.xml"
             ,target:"panoDIV"
             ,passQueryParameters:true
             ,html5:"only"
+            ,onready:function (v) { panoViewer = v; }
           });
+
+          (function () {
+            function vGet(n) { try { return panoViewer ? panoViewer.get(n) : null; } catch (e) { return null; } }
+            function vBool(n) { var v = vGet(n); return v === true || v === 'true'; }
+            function vSet(n, v) { try { if (panoViewer) panoViewer.set(n, v); } catch (e) {} }
+            function vCall(a) { try { if (panoViewer) panoViewer.call(a); } catch (e) {} }
+
+            var HOLDS = {
+              zin:   ['fov_moveforce', -1],
+              zout:  ['fov_moveforce',  1],
+              left:  ['hlookat_moveforce', -1],
+              right: ['hlookat_moveforce',  1],
+              up:    ['vlookat_moveforce', -1],
+              down:  ['vlookat_moveforce',  1]
+            };
+            var CLICKS = {
+              mode: function () {
+                vCall(vGet('tour_controlmodemousetype') === 'moveto'
+                  ? 'setControlModeDragTo()'
+                  : 'setControlModeMoveTo()');
+              },
+              rot: function () {
+                vCall(vBool('tour_autorotateenabled') ? 'stopautorotation()' : 'startautorotation()');
+              },
+              fs: function () { vCall('switchFullScreen()'); }
+            };
+
+            var bar = document.getElementById('vp-toolbar');
+            var reopen = document.getElementById('vp-reopen');
+
+            function releaseHolds() {
+              Object.keys(HOLDS).forEach(function (k) { vSet(HOLDS[k][0], 0); });
+              Array.prototype.forEach.call(bar.querySelectorAll('.is-hold'), function (b) {
+                b.classList.remove('is-hold');
+              });
+            }
+
+            bar.addEventListener('pointerdown', function (e) {
+              var b = e.target.closest ? e.target.closest('button') : null;
+              if (!b || !bar.contains(b)) return;
+              var k = b.getAttribute('data-k');
+              if (HOLDS[k]) {
+                e.preventDefault();
+                vSet(HOLDS[k][0], HOLDS[k][1]);
+                b.classList.add('is-hold');
+              }
+            });
+            window.addEventListener('pointerup', releaseHolds);
+            window.addEventListener('pointercancel', releaseHolds);
+
+            bar.addEventListener('click', function (e) {
+              var b = e.target.closest ? e.target.closest('button') : null;
+              if (!b || !bar.contains(b)) return;
+              var k = b.getAttribute('data-k');
+              if (CLICKS[k]) CLICKS[k]();
+              else if (k === 'hide') {
+                bar.classList.add('is-hidden');
+                reopen.classList.add('is-visible');
+              }
+            });
+
+            reopen.addEventListener('click', function () {
+              bar.classList.remove('is-hidden');
+              reopen.classList.remove('is-visible');
+            });
+
+            // Keep our controls visible when krpano fullscreens its container:
+            // move them into the fullscreen element (and back on exit).
+            function placeInShell(el) {
+              var host = document.fullscreenElement || document.body;
+              if (el && el.parentNode !== host) host.appendChild(el);
+            }
+            function onFsChange() {
+              placeInShell(bar);
+              placeInShell(reopen);
+              placeInShell(document.getElementById('back-link'));
+            }
+            document.addEventListener('fullscreenchange', onFsChange);
+            document.addEventListener('webkitfullscreenchange', onFsChange);
+
+            function setOn(k, on) {
+              var b = bar.querySelector('button[data-k="' + k + '"]');
+              if (b) b.classList.toggle('is-on', !!on);
+            }
+            function syncState() {
+              if (!panoViewer) return;
+              setOn('rot', vBool('tour_autorotateenabled'));
+              setOn('fs', vBool('tour_fullscreen'));
+              setOn('mode', vGet('tour_controlmodemousetype') === 'moveto');
+            }
+            setInterval(syncState, 400);
+            syncState();
+          })();
         </script>
       </div>
     </div>

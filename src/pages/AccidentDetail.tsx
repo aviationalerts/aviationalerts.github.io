@@ -1,5 +1,7 @@
 import { ArrowLeft, Plane, MapPin, Calendar, Users, BookOpen, AlertTriangle } from 'lucide-react'
 import { ACCIDENTS } from '../data/accidents'
+import { PillNav } from '../components/PillNav'
+import { SiteFooter } from '../components/SiteFooter'
 
 export default function AccidentDetail({ id }: { id: string }) {
   const accident = ACCIDENTS.find((a) => a.id === id)
@@ -7,6 +9,7 @@ export default function AccidentDetail({ id }: { id: string }) {
   if (!accident) {
     return (
       <div className="pilots-page">
+        <PillNav />
         <header className="pilots-header">
           <a href="/notable-accidents" className="pilots-back">
             <ArrowLeft size={14} />
@@ -24,6 +27,7 @@ export default function AccidentDetail({ id }: { id: string }) {
 
   return (
     <div className="pilots-page">
+      <PillNav />
       <header className="pilots-header">
         <a href="/notable-accidents" className="pilots-back">
           <ArrowLeft size={14} />
@@ -106,9 +110,7 @@ export default function AccidentDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      <footer className="pilots-footer">
-        <span>Aviation Alerts</span>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

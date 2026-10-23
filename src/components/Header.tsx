@@ -15,7 +15,7 @@ export function Header({ sb }: { sb: Soundboard }) {
   return (
     <header className="site-header">
       <nav className="header-capsule">
-        <a className="header-link" href="/cockpit-360/">Cockpit</a>
+        <a className="header-link" href="/soundboard/">Cockpit</a>
         <a className="header-link" href="/Historical-Pilots/">Pilots</a>
 
         <a className="header-logo" href="/" aria-label="Aviation Alerts home">
@@ -23,7 +23,7 @@ export function Header({ sb }: { sb: Soundboard }) {
         </a>
 
         <a className="header-link" href="/notable-accidents/">Crashes</a>
-        <a className="header-link" href="/animations/">Sim</a>
+        <a className="header-link" href="/cockpit-360/">Sim</a>
 
         <span className="header-actions">
           <button

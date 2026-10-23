@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { PILOTS, type Pilot } from '../data/pilots'
 import { ArrowLeft } from 'lucide-react'
+import { PillNav } from '../components/PillNav'
+import { SiteFooter } from '../components/SiteFooter'
 import { Frame3D, preloadFrameAssets } from '../components/Frame3D'
 
 function PilotEntry({ pilot }: { pilot: Pilot }) {
@@ -38,10 +40,11 @@ export default function HistoricalPilots() {
 
   return (
     <div className="pilots-page">
+      <PillNav />
       <header className="pilots-header">
         <a href="/" className="pilots-back">
           <ArrowLeft size={14} />
-          <span>Back to Soundboard</span>
+          <span>Home</span>
         </a>
         <div className="pilots-title-block">
           <p className="pilots-kicker">// Aviation Legends</p>
@@ -59,9 +62,7 @@ export default function HistoricalPilots() {
         ))}
       </div>
 
-      <footer className="pilots-footer">
-        <span>Aviation Alerts</span>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

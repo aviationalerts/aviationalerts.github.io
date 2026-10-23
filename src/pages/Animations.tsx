@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ArrowLeft, Play, Square } from 'lucide-react'
+import { PillNav } from '../components/PillNav'
 import { SOUNDS } from '../data/sounds'
 import { loadGLTF, visibleBox } from '../lib/gltf'
 import { AudioEngine, preloadSounds } from '../lib/audio'
@@ -305,9 +306,9 @@ export default function Animations() {
     <div className="anim-page">
       <aside className="anim-rail">
         <div className="anim-rail-head">
-          <a href="/" className="anim-back">
-            <ArrowLeft size={12} />
-            Main site
+          <a href="/" className="pilots-back anim-back">
+            <ArrowLeft size={14} />
+            Home
           </a>
           <h1 className="anim-title">
             Failure<span>SIM</span>
@@ -323,6 +324,8 @@ export default function Animations() {
             <div className="anim-craft-meta">NARROW-BODY · TWIN-ENGINE · SIM AIRFRAME 01</div>
           </div>
         </div>
+
+        <PillNav />
 
         {playingId && (
           <button type="button" className="anim-stop" onClick={stopAll}>

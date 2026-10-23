@@ -1,4 +1,4 @@
-import { Square, Waves, Volume2 } from 'lucide-react'
+import { Repeat, Square, Waves, Volume2 } from 'lucide-react'
 import type { Soundboard } from '../hooks/useSoundboard'
 
 function fmt(sec: number) {
@@ -57,6 +57,18 @@ export function PlayerBar({ sb }: { sb: Soundboard }) {
         >
           <Waves size={12} />
           <span className="ctl-label">Ambience</span>
+        </button>
+
+        <button
+          type="button"
+          className="ctl-btn"
+          data-active={sb.loopOn}
+          onClick={sb.toggleLoop}
+          aria-pressed={sb.loopOn}
+          aria-label="Toggle loop"
+        >
+          <Repeat size={12} />
+          <span className="ctl-label">Loop</span>
         </button>
 
         <label className="vol" title="Volume">

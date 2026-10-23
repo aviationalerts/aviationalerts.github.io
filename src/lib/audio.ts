@@ -77,20 +77,20 @@ export function preloadSound(id: string) {
   preloadPool.set(id, a)
 }
 
-export function preloadSounds(ids: string[], concurrency = 6) {
+export function preloadSounds(ids: string[], concurrency = 4) {
   let i = 0
   const next = () => {
     while (i < ids.length) {
       const id = ids[i++]
       if (!preloadPool.has(id)) {
         preloadSound(id)
-        // stagger to avoid network contention
-        setTimeout(next, 120)
+        // stagger so requests ramp up instead of flooding the media pipeline
+        setTimeout(next, 150)
         return
       }
     }
   }
-  for (let k = 0; k < concurrency; k++) setTimeout(next, k * 80)
+  for (let k = 0; k < concurrency; k++) setTimeout(next, k * 150)
 }
 
 export class AudioEngine {
